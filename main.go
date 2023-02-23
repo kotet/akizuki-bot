@@ -1,27 +1,27 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
 	_ "embed"
 
 	"github.com/kotet/akizuki-bot/pkg/akizuki"
+	"gopkg.in/yaml.v2"
 )
 
-//go:embed config.json
-var configJSON []byte
+//go:embed config.yaml
+var configYAML []byte
 
 type Config struct {
-	Mastodon      akizuki.DefaultTootConfig   `json:"mastodon"`
-	ScreenshotOne akizuki.ScreenShotOneConfig `json:"screenshotone"`
+	Mastodon      akizuki.DefaultTootConfig   `yaml:"mastodon"`
+	ScreenshotOne akizuki.ScreenShotOneConfig `yaml:"screenshotone"`
 }
 
 func main() {
 
 	var config Config
-	err := json.Unmarshal(configJSON, &config)
+	err := yaml.Unmarshal(configYAML, &config)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

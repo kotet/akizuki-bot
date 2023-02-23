@@ -9,11 +9,11 @@ import (
 )
 
 type DefaultTootConfig struct {
-	Server       string `json:"server"`
-	ClientID     string `json:"id"`
-	ClientSecret string `json:"secret"`
-	Username     string `json:"mail"`
-	Password     string `json:"pass"`
+	Server       string `yaml:"server"`
+	ClientID     string `yaml:"id"`
+	ClientSecret string `yaml:"secret"`
+	Username     string `yaml:"mail"`
+	Password     string `yaml:"pass"`
 }
 
 func DefaultToot(config DefaultTootConfig) (func(text string, images []io.Reader) error, error) {

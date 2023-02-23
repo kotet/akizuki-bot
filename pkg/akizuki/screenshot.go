@@ -10,8 +10,8 @@ import (
 )
 
 type ScreenShotOneConfig struct {
-	AccessKey string `json:"access"`
-	SecretKey string `json:"secret"`
+	AccessKey string `yaml:"access"`
+	SecretKey string `yaml:"secret"`
 }
 
 func ScreenShotOneTakeScreenShot(config ScreenShotOneConfig) func(url string) (io.Reader, error) {

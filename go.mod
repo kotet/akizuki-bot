@@ -10,4 +10,5 @@ require (
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
