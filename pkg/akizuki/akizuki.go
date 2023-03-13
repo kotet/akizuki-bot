@@ -75,7 +75,6 @@ func (b *AkizukiBot) RunOnce() error {
 			for _, itemImage := range item.Images {
 				defer itemImage.Close()
 			}
-			b.detector.AddPages([]string{url})
 			images := []io.Reader{}
 			if len(item.Images) > 0 {
 				images = append(images, item.Images[0])
@@ -91,6 +90,10 @@ func (b *AkizukiBot) RunOnce() error {
 
 			s := b.format(item)
 			err = b.toot(s, images)
+			if err != nil {
+				return err
+			}
+			err = b.detector.AddPages([]string{url})
 			if err != nil {
 				return err
 			}
