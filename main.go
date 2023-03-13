@@ -1,3 +1,5 @@
+//go:build embedconfig
+
 package main
 
 import (
