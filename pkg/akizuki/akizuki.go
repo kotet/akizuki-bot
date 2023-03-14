@@ -83,9 +83,10 @@ func (b *AkizukiBot) RunOnce() error {
 			if b.takeScreenShot != nil {
 				ss, err := b.takeScreenShot(url)
 				if err != nil {
-					return err
+					log.Printf("failed to take screenshot: %v", err.Error())
+				} else {
+					images = append(images, ss)
 				}
-				images = append(images, ss)
 			}
 
 			s := b.format(item)
