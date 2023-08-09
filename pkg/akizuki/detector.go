@@ -11,7 +11,7 @@ import (
 
 type defaultDetector struct {
 	path    string
-	visited *trie.Trie
+	visited *trie.Trie[struct{}]
 }
 
 const defaultDatabasePath = "akizuki.json"
@@ -53,12 +53,12 @@ func (d defaultDetector) NewPages(urls []string) ([]string, error) {
 }
 func (d defaultDetector) AddPages(urls []string) error {
 	for _, url := range urls {
-		d.visited.PutString(url, url)
+		d.visited.PutString(url, struct{}{})
 	}
 
 	visited := []string{}
 
-	d.visited.Iterate(func(prefix []byte, value trie.ValueType) {
+	d.visited.Iterate(func(prefix []byte, value struct{}) {
 		visited = append(visited, string(prefix))
 	})
 

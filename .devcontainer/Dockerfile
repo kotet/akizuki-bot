@@ -21,7 +21,7 @@ RUN apt-get update --no-install-recommends \
         phantomjs \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
-ARG GO_VERSION=1.20.1
+ARG GO_VERSION=1.21.0
 RUN curl "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" -L --output go.tar.gz \
     && tar xvf go.tar.gz -C /usr/local/ \
     && echo 'export PATH=$PATH:/usr/local/go/bin:/home/vscode/.local/bin' >> /etc/profile \
