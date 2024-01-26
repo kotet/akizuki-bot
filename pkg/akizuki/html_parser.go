@@ -10,8 +10,12 @@ import (
 func getFirstByClassName(node *html.Node, classname string) *html.Node {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
-			if hasAttr(c, "class", classname) {
-				return c
+			class := getAttr(c, "class")
+			classes := strings.Split(class, " ")
+			for _, cls := range classes {
+				if cls == classname {
+					return c
+				}
 			}
 			if n := getFirstByClassName(c, classname); n != nil {
 				return n

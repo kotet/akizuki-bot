@@ -10,6 +10,7 @@ import (
 
 const defaultCatalogURL = "https://akizukidenshi.com/catalog/e/enewall_dL/"
 
+// retrieve catalog page and find new item urls
 func defaultCatalogParser() ([]string, error) {
 	resp, err := http.Get(defaultCatalogURL)
 	if err != nil {
@@ -21,33 +22,49 @@ func defaultCatalogParser() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	urls := []string{}
-	findItemTable(node, &urls)
+	findItemList(node, &urls)
 	return urls, nil
 }
 
-func findItemTable(node *html.Node, dst *[]string) {
+func findItemList(node *html.Node, dst *[]string) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
-			if c.DataAtom == atom.Table {
-				if hasAttr(c, "width", "600") {
-					if s := parseItemTable(c); s != "" {
-						if url, err := url.JoinPath(defaultBasePath, s); err == nil {
-							*dst = append(*dst, url)
-						}
-					}
+			if c.DataAtom == atom.Ul {
+				if hasAttr(c, "class", "block-cart-i--items") {
+					parseItemList(c, dst)
+					return
 				}
 			}
-			findItemTable(c, dst)
+			findItemList(c, dst)
 		}
 	}
 }
 
-func parseItemTable(node *html.Node) string {
-	td := getFirstByClassName(node, "cart_tdl")
-	if td == nil {
+func parseItemList(node *html.Node, dst *[]string) {
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.ElementNode {
+			if c.DataAtom == atom.Dl {
+				url := parseItem(c)
+				if url != "" {
+					*dst = append(*dst, url)
+				}
+			}
+			parseItemList(c, dst)
+		}
+	}
+}
+
+func parseItem(node *html.Node) string {
+	a := getFirstByClassName(node, "js-enhanced-ecommerce-goods-name")
+	if a == nil {
 		return ""
 	}
-	href := findLink(td)
-	return href
+	href := getAttr(a, "href")
+	u, err := url.JoinPath(defaultBasePath, href)
+	if err != nil {
+		return ""
+	}
+	return u
 }

@@ -1,7 +1,6 @@
 package akizuki
 
 import (
-	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,8 +9,6 @@ import (
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 )
 
 func defaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error) {
@@ -27,18 +24,12 @@ func defaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error)
 		}
 		defer resp.Body.Close()
 
-		shiftJISReader := transform.NewReader(resp.Body, japanese.ShiftJIS.NewDecoder())
-
-		node, err := html.Parse(shiftJISReader)
+		node, err := html.Parse(resp.Body)
 		if err != nil {
 			return nil, err
 		}
-		// retrieve image
-		imgLink := getFirstById(node, "imglink")
-		if imgLink == nil {
-			return nil, errors.New("failed to parse")
-		}
-		imgURL := getAttr(imgLink, "href")
+
+		imgURL := findImageURL(node)
 
 		fullImgURL, err := url.JoinPath(defaultBasePath, imgURL)
 		if err != nil {
@@ -50,16 +41,9 @@ func defaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error)
 			return nil, err
 		}
 
-		// parse order info
-		order := getFirstByClassName(node, "order_g")
-		if order == nil {
-			return nil, errors.New("failed to parse")
-		}
-
-		name, price, itemCode, err := parseOrder(order)
-		if err != nil {
-			return nil, err
-		}
+		name := parseTitle(node)
+		price := parsePrice(node)
+		itemCode := parseItemCode(node)
 
 		return &Item{
 			Url:      itemURL,
@@ -73,28 +57,44 @@ func defaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error)
 	}
 }
 
-func parseOrder(order *html.Node) (name string, price string, itemCode string, err error) {
-	title := strings.Split(getFirstText(order), "\u3000")
-	itemCode = strings.Trim(title[0], "[]")
-	name = strings.Trim(strings.Join(title[1:], " "), " ")
+func findImageURL(node *html.Node) string {
+	d := getFirstByClassName(node, "block-src-l")
+	if d == nil {
+		return ""
+	}
+	i := getFirstByAtom(d, atom.Img)
+	if i == nil {
+		return ""
+	}
+	return getAttr(i, "data-src")
+}
 
-	table := getFirstByAtom(order, atom.Table)
-	if table == nil {
-		err = errors.New("failed to parse")
-		return
+func parseTitle(node *html.Node) string {
+	h1 := getFirstByAtom(node, atom.H1)
+	if h1 == nil {
+		return ""
 	}
-	tr := getFirstByAtom(table, atom.Tr)
-	if tr == nil {
-		err = errors.New("failed to parse")
-		return
+	return getText(h1)
+}
+
+func parseItemCode(node *html.Node) string {
+	dd := getFirstById(node, "spec_goods")
+	if dd == nil {
+		return ""
 	}
-	td := getFirstByAtom(table, atom.Td)
-	if td == nil {
-		err = errors.New("failed to parse")
-		return
+	return getText(dd)
+}
+
+func parsePrice(node *html.Node) string {
+	div := getFirstByClassName(node, "block-goods-price--price")
+	if div == nil {
+		return ""
 	}
-	price = strings.ReplaceAll(getText(td), "\t", "")
-	price = strings.ReplaceAll(price, "\n", " ")
-	price = strings.Trim(price, " ")
-	return
+	builder := strings.Builder{}
+	for c := div.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.TextNode {
+			builder.WriteString(c.Data)
+		}
+	}
+	return strings.Trim(builder.String(), " \n\t")
 }
