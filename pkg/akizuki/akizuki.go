@@ -54,6 +54,24 @@ func (b *AkizukiBot) SetToot(f func(text string, images []io.Reader) error) *Aki
 	return b
 }
 
+func (b *AkizukiBot) UpdateDB() error {
+	urls, err := b.parseCatalog()
+	if err != nil {
+		return err
+	}
+
+	newURLs, err := b.detector.NewPages(urls)
+	if err != nil {
+		return err
+	}
+
+	err = b.detector.AddPages(newURLs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *AkizukiBot) RunOnce() error {
 	urls, err := b.parseCatalog()
 	if err != nil {
