@@ -1,6 +1,5 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-ENV HOME /root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update --no-install-recommends \
@@ -17,8 +16,7 @@ RUN apt-get update --no-install-recommends \
 
 RUN apt-get update --no-install-recommends \
     && apt-get install -y \
-        build-essential curl zip fonts-noto-cjk \
-        phantomjs \
+        build-essential curl zip \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 ARG GO_VERSION=1.21.0
@@ -32,15 +30,3 @@ RUN groupadd --gid 1000 vscode \
 
 USER vscode
 ENV HOME /home/vscode
-
-RUN . /etc/profile \
-    && go install -v github.com/ramya-rao-a/go-outline@latest \
-    && go install -v github.com/cweill/gotests/gotests@latest \
-    && go install -v github.com/fatih/gomodifytags@latest \
-    && go install -v github.com/josharian/impl@latest \
-    && go install -v github.com/haya14busa/goplay/cmd/goplay@latest \
-    && go install -v github.com/go-delve/delve/cmd/dlv@latest \
-    && go install -v honnef.co/go/tools/cmd/staticcheck@latest \
-    && go install -v golang.org/x/tools/gopls@latest \
-    && go install -v golang.org/x/tools/cmd/goimports@latest \
-    && go install -v github.com/stamblerre/gocode@latest

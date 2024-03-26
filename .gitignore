@@ -1,2 +1,3 @@
 *.json
 *.yaml
+!.devcontainer/devcontainer.json

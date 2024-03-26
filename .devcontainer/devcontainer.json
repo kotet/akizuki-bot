@@ -1,0 +1,27 @@
+{
+    "name": "akizuki-bot-dev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".",
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    },
+                },
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.tabSize": 2,
+            },
+            "extensions": [
+                "visualstudioexptteam.vscodeintellicode",
+                "redhat.vscode-yaml",
+                "golang.go",
+            ]
+        }
+    },
+    "updateRemoteUserUID": true,
+    "remoteUser": "vscode",
+}
