@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func defaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error) {
+func DefaultParseItem(minWait time.Duration) func(itemURL string) (*Item, error) {
 	lastVisit := time.Now()
 	return func(itemURL string) (*Item, error) {
 		if lastVisit.Add(minWait).After(time.Now()) {

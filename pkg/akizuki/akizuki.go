@@ -3,29 +3,31 @@ package akizuki
 import (
 	"io"
 	"log"
-	"time"
 )
 
 const defaultBasePath = "https://akizukidenshi.com"
 
+type CatalogParser func() ([]string, error)
+type ItemParser func(url string) (*Item, error)
+
 type AkizukiBot struct {
-	parseCatalog   func() ([]string, error)
+	parseCatalog   CatalogParser
 	detector       NewPageDetector
-	parseItem      func(url string) (*Item, error)
+	parseItem      ItemParser
 	takeScreenShot func(url string) (io.Reader, error)
 	format         func(item *Item) string
 	toot           func(text string, images []io.Reader) error
 }
 
-func NewBot() (*AkizukiBot, error) {
-	d, err := NewDefaultDetector(defaultDatabasePath)
-	if err != nil {
-		return nil, err
-	}
+func NewBot(
+	catalog CatalogParser,
+	detector NewPageDetector,
+	item ItemParser,
+) (*AkizukiBot, error) {
 	return &AkizukiBot{
-		parseCatalog: defaultCatalogParser,
-		detector:     d,
-		parseItem:    defaultParseItem(time.Second),
+		parseCatalog: catalog,
+		detector:     detector,
+		parseItem:    item,
 	}, nil
 }
 

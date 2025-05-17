@@ -11,7 +11,7 @@ import (
 const defaultCatalogURL = "https://akizukidenshi.com/catalog/e/enewall_dL/"
 
 // retrieve catalog page and find new item urls
-func defaultCatalogParser() ([]string, error) {
+func DefaultCatalogParser() ([]string, error) {
 	resp, err := http.Get(defaultCatalogURL)
 	if err != nil {
 		return nil, err

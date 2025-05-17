@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/kotet/akizuki-bot/pkg/akizuki"
 	"gopkg.in/yaml.v2"
@@ -32,7 +33,16 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	bot, err := akizuki.NewBot()
+	detector, err := akizuki.NewDefaultDetector("akizuki.json")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	bot, err := akizuki.NewBot(
+		akizuki.DefaultCatalogParser,
+		detector,
+		akizuki.DefaultParseItem(time.Second),
+	)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
